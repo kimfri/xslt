@@ -6,18 +6,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 public class XsltTransformer {
-    public static void main(String[] args) {
-        XsltTransformer xsltTransformer = new XsltTransformer();
-        xsltTransformer.doit();
-    }
 
-    private void doit() {
-        final String dir = "src/main/resources/";
-        final String outputDir = "target/";
-        final String xmlFile = dir + "courses.xml";
-        final String xslFile = dir + "coursesXml2studentsXml.xsl";
-        final String outputXmlFile = outputDir + "students.xml";
-
+    protected static void transform(String xmlFile, String xslFile, String outputXmlFile) {
         StreamSource xslSource = new StreamSource(xslFile);
         StreamSource xmlSource = new StreamSource(xmlFile);
         StreamResult xmlOutput = new StreamResult(outputXmlFile);
