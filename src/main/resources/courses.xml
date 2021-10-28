@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<courses>
+    <course title="Java">
+        <students>
+            <student id="1">
+                <first>Kim</first>
+            </student>
+            <student id="2">
+                <first>Maria</first>
+            </student>
+        </students>
+    </course>
+    <course title="C++">
+        <students>
+            <student id="3">
+                <first>Wille</first>
+            </student>
+            <student id="4">
+                <first>Theo</first>
+            </student>
+        </students>
+    </course>
+</courses>
