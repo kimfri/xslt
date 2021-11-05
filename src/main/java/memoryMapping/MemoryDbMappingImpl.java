@@ -7,41 +7,28 @@ import java.util.Optional;
 
 public class MemoryDbMappingImpl implements MemoryDbMapping {
     private final HashMap<String, UserInfo> memoryMap;
-    private final HashMap<String, Long> timeMap;
 
     @Inject
     public MemoryDbMappingImpl(HashMap<String, UserInfo> memoryMap,
                                HashMap<String, Long> timeMap) {
         this.memoryMap = memoryMap;
-        this.timeMap = timeMap;
     }
 
     @Override
     public Optional<UserInfo> getUserInfo(String userInfoId) {
-        if(isInfoOld(userInfoId)){
-            System.out.println("Record is too old: id " + userInfoId);
+        if(!this.memoryMap.containsKey(userInfoId)) return Optional.empty();
+
+        UserInfo userInfo = memoryMap.get(userInfoId);
+        if (userInfo.isItemTooOld()) {
+            this.memoryMap.remove(userInfoId);
             return Optional.empty();
         }
         System.out.println("Record is ok: id " + userInfoId);
-        return Optional.ofNullable(this.memoryMap.get(userInfoId));
-    }
-
-    private boolean isInfoOld(String userInfoId) {
-        if(!this.timeMap.containsKey(userInfoId)) return true;
-        long recordTime = this.timeMap.get(userInfoId);
-        if (System.currentTimeMillis() - recordTime > 2000) {
-            System.out.println("Record will be removed: id " + userInfoId);
-            this.timeMap.remove(userInfoId);
-            this.memoryMap.remove(userInfoId);
-            return true;
-        }
-        return false;
+        return Optional.of(this.memoryMap.get(userInfoId));
     }
 
     @Override
     public void addUserInfo(UserInfo userInfo) {
         this.memoryMap.put(userInfo.getUserId(), userInfo);
-        this.timeMap.put(userInfo.getUserId(), System.currentTimeMillis());
     }
-
 }
