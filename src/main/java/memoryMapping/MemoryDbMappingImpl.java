@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public class MemoryDbMappingImpl implements MemoryDbMapping {
     private final HashMap<String, UserInfo> memoryMap;
+    private static final Object SEMAPHORE = new Object();
 
     @Inject
     public MemoryDbMappingImpl(HashMap<String, UserInfo> memoryMap,
@@ -16,19 +17,20 @@ public class MemoryDbMappingImpl implements MemoryDbMapping {
 
     @Override
     public Optional<UserInfo> getUserInfo(String userInfoId) {
-        if(!this.memoryMap.containsKey(userInfoId)) return Optional.empty();
-
-        UserInfo userInfo = memoryMap.get(userInfoId);
-        if (userInfo.isItemTooOld()) {
-            this.memoryMap.remove(userInfoId);
+        UserInfo userInfo;
+        synchronized (SEMAPHORE) {
+            userInfo = memoryMap.get(userInfoId);
+        }
+        if (userInfo == null || userInfo.isItemTooOld()) {
             return Optional.empty();
         }
-        System.out.println("Record is ok: id " + userInfoId);
-        return Optional.of(this.memoryMap.get(userInfoId));
+        return Optional.of(userInfo);
     }
 
     @Override
     public void addUserInfo(UserInfo userInfo) {
-        this.memoryMap.put(userInfo.getUserId(), userInfo);
+        synchronized (SEMAPHORE) {
+            this.memoryMap.put(userInfo.getUserId(), userInfo);
+        }
     }
 }
