@@ -6,31 +6,31 @@ import java.util.HashMap;
 import java.util.Optional;
 
 public class MemoryDbMappingImpl implements MemoryDbMapping {
-    private final HashMap<String, UserInfo> memoryMap;
+    private final HashMap<String, TimedUserContainer> memoryMap;
     private static final Object SEMAPHORE = new Object();
 
     @Inject
-    public MemoryDbMappingImpl(HashMap<String, UserInfo> memoryMap,
+    public MemoryDbMappingImpl(HashMap<String, TimedUserContainer> memoryMap,
                                HashMap<String, Long> timeMap) {
         this.memoryMap = memoryMap;
     }
 
     @Override
     public Optional<UserInfo> getUserInfo(String userInfoId) {
-        UserInfo userInfo;
+        TimedUserContainer timedUserContainer;
         synchronized (SEMAPHORE) {
-            userInfo = memoryMap.get(userInfoId);
+            timedUserContainer = memoryMap.get(userInfoId);
         }
-        if (userInfo == null || userInfo.isItemTooOld()) {
+        if (timedUserContainer == null || timedUserContainer.isItemTooOld()) {
             return Optional.empty();
         }
-        return Optional.of(userInfo);
+        return Optional.of(timedUserContainer.getUserInfo());
     }
 
     @Override
     public void addUserInfo(UserInfo userInfo) {
         synchronized (SEMAPHORE) {
-            this.memoryMap.put(userInfo.getUserId(), userInfo);
+            this.memoryMap.put(userInfo.getUserId(), new TimedUserContainer(userInfo));
         }
     }
 }
