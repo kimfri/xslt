@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 public class XPathThingies {
 
@@ -29,9 +30,10 @@ public class XPathThingies {
         return builder.parse(inputStream);
     }
 
-    String getValueFromPath(Document document, String xPathExpression)
+    Optional<String> getValueFromPath(Document document, String xPathExpression)
             throws XPathExpressionException {
         XPath xPath = XPathFactory.newInstance().newXPath();
-        return (String) xPath.compile(xPathExpression).evaluate(document, XPathConstants.STRING);
+        return Optional.of((String) xPath.compile(xPathExpression)
+                .evaluate(document, XPathConstants.STRING));
     }
 }
